@@ -1,7 +1,7 @@
 package com.todoratanasov.jobtracker.controller;
 
-import com.todoratanasov.jobtracker.model.JobApplication;
 import com.todoratanasov.jobtracker.model.JobApplicationRequest;
+import com.todoratanasov.jobtracker.model.JobApplicationResponse;
 import com.todoratanasov.jobtracker.service.JobApplicationService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping(JobApplicationController.BASE_PATH)
@@ -24,17 +25,17 @@ public class JobApplicationController {
     }
 
     @GetMapping
-    public List<JobApplication> list() {
+    public List<JobApplicationResponse> list() {
         return service.findAll();
     }
 
     @GetMapping("/{id}")
-    public JobApplication get(@PathVariable Long id) {
+    public JobApplicationResponse get(@PathVariable UUID id) {
         return service.getById(id);
     }
 
     @PostMapping
-    public ResponseEntity<JobApplication> create(@Valid @RequestBody JobApplicationRequest request) {
+    public ResponseEntity<JobApplicationResponse> create(@Valid @RequestBody JobApplicationRequest request) {
         var created = service.create(request);
         var location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}")
@@ -44,8 +45,8 @@ public class JobApplicationController {
     }
 
     @PutMapping("/{id}")
-    public JobApplication update(
-            @PathVariable Long id,
+    public JobApplicationResponse update(
+            @PathVariable UUID id,
             @Valid @RequestBody JobApplicationRequest request
     ) {
         return service.update(id, request);
@@ -53,7 +54,7 @@ public class JobApplicationController {
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable Long id) {
+    public void delete(@PathVariable UUID id) {
         service.delete(id);
     }
 }

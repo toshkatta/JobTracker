@@ -1,64 +1,72 @@
 package com.todoratanasov.jobtracker.service;
 
+import com.todoratanasov.jobtracker.entity.JobApplication;
 import com.todoratanasov.jobtracker.error.ApplicationNotFoundException;
-import com.todoratanasov.jobtracker.model.JobApplication;
 import com.todoratanasov.jobtracker.model.JobApplicationRequest;
+import com.todoratanasov.jobtracker.model.JobApplicationResponse;
+import com.todoratanasov.jobtracker.repository.JobApplicationRepository;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicLong;
+import java.util.UUID;
 
 @Service
 public class JobApplicationService {
 
-    private final Map<Long, JobApplication> applicationsById = new ConcurrentHashMap<>();
-    private final AtomicLong lastAssignedId = new AtomicLong();
+    private final JobApplicationRepository repository;
 
-    public List<JobApplication> findAll() {
-        return applicationsById.values().stream()
-                .sorted(Comparator.comparing(JobApplication::id))
-                .toList();
-    }
-
-    public JobApplication getById(Long id) {
-        return Optional.ofNullable(applicationsById.get(id))
+    private JobApplication findEntity(UUID id) {
+        return repository.findById(id)
                 .orElseThrow(() -> new ApplicationNotFoundException(id));
     }
 
-    public JobApplication create(JobApplicationRequest request) {
-        long id = lastAssignedId.incrementAndGet();
-        var application = new JobApplication(
-                id,
+    public JobApplicationService(JobApplicationRepository repository) {
+        this.repository = repository;
+    }
+
+    @Transactional(readOnly = true)
+    public List<JobApplicationResponse> findAll() {
+        return repository.findAll(Sort.by("id")).stream()
+                .map(JobApplicationResponse::from)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public JobApplicationResponse getById(UUID id) {
+        return JobApplicationResponse.from(findEntity(id));
+    }
+
+    @Transactional
+    public JobApplicationResponse create(JobApplicationRequest request) {
+        var entity = new JobApplication(
                 request.company(),
                 request.position(),
                 request.status(),
                 request.salary()
         );
-        applicationsById.put(id, application);
-        return application;
+
+        return JobApplicationResponse.from(repository.save(entity));
     }
 
-    public JobApplication update(Long id, JobApplicationRequest request) {
-        getById(id);
-
-        var updated = new JobApplication(
-                id,
+    @Transactional
+    public JobApplicationResponse update(UUID id, JobApplicationRequest request) {
+        var entity = findEntity(id);
+        entity.update(
                 request.company(),
                 request.position(),
                 request.status(),
                 request.salary()
         );
-        applicationsById.put(id, updated);
-        return updated;
+        return JobApplicationResponse.from(entity);
     }
 
-    public void delete(Long id) {
-        if (applicationsById.remove(id) == null) {
+    @Transactional
+    public void delete(UUID id) {
+        if (!repository.existsById(id)) {
             throw new ApplicationNotFoundException(id);
         }
+        repository.deleteById(id);
     }
 }
