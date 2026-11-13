@@ -17,7 +17,7 @@ public class JobApplicationService {
 
     private final JobApplicationRepository repository;
 
-    private JobApplication findEntity(UUID id) {
+    private JobApplication getJobApplicationOrThrow(UUID id) {
         return repository.findById(id)
                 .orElseThrow(() -> new ApplicationNotFoundException(id));
     }
@@ -35,7 +35,7 @@ public class JobApplicationService {
 
     @Transactional(readOnly = true)
     public JobApplicationResponse getById(UUID id) {
-        return JobApplicationResponse.from(findEntity(id));
+        return JobApplicationResponse.from(getJobApplicationOrThrow(id));
     }
 
     @Transactional
@@ -52,7 +52,7 @@ public class JobApplicationService {
 
     @Transactional
     public JobApplicationResponse update(UUID id, JobApplicationRequest request) {
-        var entity = findEntity(id);
+        var entity = getJobApplicationOrThrow(id);
         entity.update(
                 request.company(),
                 request.position(),

@@ -13,12 +13,10 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping(JobApplicationController.BASE_PATH)
+@RequestMapping(ApiPaths.APPLICATIONS)
 public class JobApplicationController {
 
     private final JobApplicationService service;
-
-    public static final String BASE_PATH = "/api/applications";
 
     public JobApplicationController(JobApplicationService service) {
         this.service = service;

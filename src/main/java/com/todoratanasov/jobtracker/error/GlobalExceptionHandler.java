@@ -47,4 +47,11 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         problem.setTitle("Application not found");
         return problem;
     }
+
+    @ExceptionHandler(NoteNotFoundException.class)
+    public ProblemDetail handleNoteNotFound(NoteNotFoundException ex) {
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.getMessage());
+        problem.setTitle("Note not found");
+        return problem;
+    }
 }
