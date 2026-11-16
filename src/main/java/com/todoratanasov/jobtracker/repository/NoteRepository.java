@@ -9,7 +9,7 @@ import java.util.UUID;
 
 public interface NoteRepository extends JpaRepository<Note, UUID> {
 
-    List<Note> findByJobApplicationIdOrderByCreatedAtAsc(UUID jobApplicationId);
+  List<Note> findByJobApplicationIdOrderByCreatedAtAsc(UUID jobApplicationId);
 
-    Optional<Note> findByIdAndJobApplicationId(UUID id, UUID jobApplicationId);
+  Optional<Note> findByIdAndJobApplicationId(UUID id, UUID jobApplicationId);
 }

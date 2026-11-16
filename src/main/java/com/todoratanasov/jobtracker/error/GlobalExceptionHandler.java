@@ -1,6 +1,5 @@
 package com.todoratanasov.jobtracker.error;
 
-
 import jakarta.annotation.Nullable;
 import org.jspecify.annotations.NullMarked;
 import org.springframework.http.*;
@@ -17,41 +16,50 @@ import java.util.Objects;
 @RestControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
-    record FieldViolation(String field, String message) {
-    }
+  record FieldViolation(String field, String message) {
+  }
 
-    @Override
-    protected @Nullable ResponseEntity<Object> handleMethodArgumentNotValid(
-            MethodArgumentNotValidException ex,
-            HttpHeaders headers,
-            HttpStatusCode status,
-            WebRequest request
-    ) {
-        List<FieldViolation> errors = ex.getBindingResult().getFieldErrors().stream()
-                .map(error -> new FieldViolation(
-                        error.getField(),
-                        Objects.requireNonNullElse(error.getDefaultMessage(), "Invalid value")
-                ))
-                .toList();
+  @Override
+  protected @Nullable ResponseEntity<Object> handleMethodArgumentNotValid(
+      MethodArgumentNotValidException ex,
+      HttpHeaders headers,
+      HttpStatusCode status,
+      WebRequest request
+  ) {
+    List<FieldViolation> errors = ex.getBindingResult().getFieldErrors().stream()
+        .map(
+            error -> new FieldViolation(
+                error.getField(),
+                Objects.requireNonNullElse(error.getDefaultMessage(), "Invalid value")
+            )
+        )
+        .toList();
 
-        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, "Request validation failed");
-        problem.setTitle("Validation failed");
-        problem.setProperty("errors", errors);
+    ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, "Request validation failed");
+    problem.setTitle("Validation failed");
+    problem.setProperty("errors", errors);
 
-        return handleExceptionInternal(ex, problem, headers, status, request);
-    }
+    return handleExceptionInternal(ex, problem, headers, status, request);
+  }
 
-    @ExceptionHandler(ApplicationNotFoundException.class)
-    public ProblemDetail handleNotFound(ApplicationNotFoundException ex) {
-        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.getMessage());
-        problem.setTitle("Application not found");
-        return problem;
-    }
+  @ExceptionHandler(ApplicationNotFoundException.class)
+  public ProblemDetail handleNotFound(ApplicationNotFoundException ex) {
+    ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.getMessage());
+    problem.setTitle("Application not found");
+    return problem;
+  }
 
-    @ExceptionHandler(NoteNotFoundException.class)
-    public ProblemDetail handleNoteNotFound(NoteNotFoundException ex) {
-        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.getMessage());
-        problem.setTitle("Note not found");
-        return problem;
-    }
+  @ExceptionHandler(NoteNotFoundException.class)
+  public ProblemDetail handleNoteNotFound(NoteNotFoundException ex) {
+    ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.getMessage());
+    problem.setTitle("Note not found");
+    return problem;
+  }
+
+  @ExceptionHandler(InvalidSortException.class)
+  public ProblemDetail handleInvalidSort(InvalidSortException ex) {
+    ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, ex.getMessage());
+    problem.setTitle("Invalid sort parameter");
+    return problem;
+  }
 }

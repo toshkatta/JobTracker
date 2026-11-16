@@ -17,38 +17,38 @@ import java.util.UUID;
 @Service
 public class NoteService {
 
-    private final NoteRepository noteRepository;
-    private final JobApplicationRepository jobApplicationRepository;
+  private final NoteRepository noteRepository;
+  private final JobApplicationRepository jobApplicationRepository;
 
-    private JobApplication getJobApplicationOrThrow(UUID jobApplicationId) {
-        return jobApplicationRepository.findById(jobApplicationId)
-                .orElseThrow(() -> new ApplicationNotFoundException(jobApplicationId));
-    }
+  private JobApplication getJobApplicationOrThrow(UUID jobApplicationId) {
+    return jobApplicationRepository.findById(jobApplicationId)
+        .orElseThrow(() -> new ApplicationNotFoundException(jobApplicationId));
+  }
 
-    public NoteService(NoteRepository noteRepository, JobApplicationRepository jobApplicationRepository) {
-        this.noteRepository = noteRepository;
-        this.jobApplicationRepository = jobApplicationRepository;
-    }
+  public NoteService(NoteRepository noteRepository, JobApplicationRepository jobApplicationRepository) {
+    this.noteRepository = noteRepository;
+    this.jobApplicationRepository = jobApplicationRepository;
+  }
 
-    @Transactional(readOnly = true)
-    public List<NoteResponse> findAll(UUID jobApplicationId) {
-        getJobApplicationOrThrow(jobApplicationId);
-        return noteRepository.findByJobApplicationIdOrderByCreatedAtAsc((jobApplicationId)).stream()
-                .map(NoteResponse::from)
-                .toList();
-    }
+  @Transactional(readOnly = true)
+  public List<NoteResponse> findAll(UUID jobApplicationId) {
+    getJobApplicationOrThrow(jobApplicationId);
+    return noteRepository.findByJobApplicationIdOrderByCreatedAtAsc((jobApplicationId)).stream()
+        .map(NoteResponse::from)
+        .toList();
+  }
 
-    @Transactional
-    public NoteResponse create(UUID jobApplicationId, NoteRequest request) {
-        var application = getJobApplicationOrThrow(jobApplicationId);
-        var note = new Note(application, request.content(), request.important());
-        return NoteResponse.from(noteRepository.save(note));
-    }
+  @Transactional
+  public NoteResponse create(UUID jobApplicationId, NoteRequest request) {
+    var application = getJobApplicationOrThrow(jobApplicationId);
+    var note = new Note(application, request.content(), request.important());
+    return NoteResponse.from(noteRepository.save(note));
+  }
 
-    @Transactional
-    public void delete(UUID jobApplicationId, UUID noteId) {
-        var note = noteRepository.findByIdAndJobApplicationId(noteId, jobApplicationId)
-                .orElseThrow(() -> new NoteNotFoundException(noteId));
-        noteRepository.delete(note);
-    }
+  @Transactional
+  public void delete(UUID jobApplicationId, UUID noteId) {
+    var note = noteRepository.findByIdAndJobApplicationId(noteId, jobApplicationId)
+        .orElseThrow(() -> new NoteNotFoundException(noteId));
+    noteRepository.delete(note);
+  }
 }

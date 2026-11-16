@@ -16,33 +16,33 @@ import java.util.UUID;
 @RequestMapping(ApiPaths.APPLICATION_NOTES)
 public class NoteController {
 
-    private final NoteService service;
+  private final NoteService service;
 
-    public NoteController(NoteService service) {
-        this.service = service;
-    }
+  public NoteController(NoteService service) {
+    this.service = service;
+  }
 
-    @GetMapping
-    public List<NoteResponse> list(@PathVariable UUID jobApplicationId) {
-        return service.findAll(jobApplicationId);
-    }
+  @GetMapping
+  public List<NoteResponse> list(@PathVariable UUID jobApplicationId) {
+    return service.findAll(jobApplicationId);
+  }
 
-    @PostMapping
-    public ResponseEntity<NoteResponse> create(
-            @PathVariable UUID jobApplicationId,
-            @Valid @RequestBody NoteRequest request
-    ) {
-        var created = service.create(jobApplicationId, request);
-        var location = ServletUriComponentsBuilder.fromCurrentRequest()
-                .path("/{id}")
-                .buildAndExpand(created.id())
-                .toUri();
-        return ResponseEntity.created(location).body(created);
-    }
+  @PostMapping
+  public ResponseEntity<NoteResponse> create(
+      @PathVariable UUID jobApplicationId,
+      @Valid @RequestBody NoteRequest request
+  ) {
+    var created = service.create(jobApplicationId, request);
+    var location = ServletUriComponentsBuilder.fromCurrentRequest()
+        .path("/{id}")
+        .buildAndExpand(created.id())
+        .toUri();
+    return ResponseEntity.created(location).body(created);
+  }
 
-    @DeleteMapping("/{noteId}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable UUID jobApplicationId, @PathVariable UUID noteId) {
-        service.delete(jobApplicationId, noteId);
-    }
+  @DeleteMapping("/{noteId}")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void delete(@PathVariable UUID jobApplicationId, @PathVariable UUID noteId) {
+    service.delete(jobApplicationId, noteId);
+  }
 }

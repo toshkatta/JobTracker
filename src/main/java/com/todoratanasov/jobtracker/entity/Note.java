@@ -10,51 +10,51 @@ import java.util.UUID;
 @Table(name = "notes")
 public class Note {
 
-    @Id
-    @GeneratedValue
-    @UuidGenerator(style = UuidGenerator.Style.VERSION_7)
-    private UUID id;
+  @Id
+  @GeneratedValue
+  @UuidGenerator(style = UuidGenerator.Style.VERSION_7)
+  private UUID id;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "job_application_id", nullable = false)
-    private JobApplication jobApplication;
+  @ManyToOne(fetch = FetchType.LAZY, optional = false)
+  @JoinColumn(name = "job_application_id", nullable = false)
+  private JobApplication jobApplication;
 
-    @Column(nullable = false, length = 2000)
-    private String content;
+  @Column(nullable = false, length = 2000)
+  private String content;
 
-    @Column(nullable = false)
-    private boolean important;
+  @Column(nullable = false)
+  private boolean important;
 
-    @Column(nullable = false, updatable = false)
-    private Instant createdAt;
+  @Column(nullable = false, updatable = false)
+  private Instant createdAt;
 
-    protected Note() {
-    }
+  protected Note() {
+  }
 
-    public Note(JobApplication jobApplication, String content, boolean important) {
-        this.jobApplication = jobApplication;
-        this.content = content;
-        this.important = important;
-        this.createdAt = Instant.now();
-    }
+  public Note(JobApplication jobApplication, String content, boolean important) {
+    this.jobApplication = jobApplication;
+    this.content = content;
+    this.important = important;
+    this.createdAt = Instant.now();
+  }
 
-    public UUID getId() {
-        return id;
-    }
+  public UUID getId() {
+    return id;
+  }
 
-    public JobApplication getJobApplication() {
-        return jobApplication;
-    }
+  public JobApplication getJobApplication() {
+    return jobApplication;
+  }
 
-    public String getContent() {
-        return content;
-    }
+  public String getContent() {
+    return content;
+  }
 
-    public boolean isImportant() {
-        return important;
-    }
+  public boolean isImportant() {
+    return important;
+  }
 
-    public Instant getCreatedAt() {
-        return createdAt;
-    }
+  public Instant getCreatedAt() {
+    return createdAt;
+  }
 }

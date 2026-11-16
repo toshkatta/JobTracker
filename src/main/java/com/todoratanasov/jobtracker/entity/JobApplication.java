@@ -10,57 +10,57 @@ import java.util.UUID;
 @Table(name = "job_applications")
 public class JobApplication {
 
-    @Id
-    @GeneratedValue
-    @UuidGenerator(style = UuidGenerator.Style.VERSION_7)
-    private UUID id;
+  @Id
+  @GeneratedValue
+  @UuidGenerator(style = UuidGenerator.Style.VERSION_7)
+  private UUID id;
 
-    @Column(nullable = false, length = 100)
-    private String company;
+  @Column(nullable = false, length = 100)
+  private String company;
 
-    @Column(nullable = false, length = 100)
-    private String position;
+  @Column(nullable = false, length = 100)
+  private String position;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 20)
-    private ApplicationStatus status;
+  @Enumerated(EnumType.STRING)
+  @Column(nullable = false, length = 20)
+  private ApplicationStatus status;
 
-    private Integer salary;
+  private Integer salary;
 
-    protected JobApplication() {
-    }
+  protected JobApplication() {
+  }
 
-    public JobApplication(String company, String position, ApplicationStatus status, Integer salary) {
-        this.company = company;
-        this.position = position;
-        this.status = status;
-        this.salary = salary;
-    }
+  public JobApplication(String company, String position, ApplicationStatus status, Integer salary) {
+    this.company = company;
+    this.position = position;
+    this.status = status;
+    this.salary = salary;
+  }
 
-    public void update(String company, String position, ApplicationStatus status, Integer salary) {
-        this.company = company;
-        this.position = position;
-        this.status = status;
-        this.salary = salary;
-    }
+  public void update(String company, String position, ApplicationStatus status, Integer salary) {
+    this.company = company;
+    this.position = position;
+    this.status = status;
+    this.salary = salary;
+  }
 
-    public UUID getId() {
-        return id;
-    }
+  public UUID getId() {
+    return id;
+  }
 
-    public String getCompany() {
-        return company;
-    }
+  public String getCompany() {
+    return company;
+  }
 
-    public String getPosition() {
-        return position;
-    }
+  public String getPosition() {
+    return position;
+  }
 
-    public ApplicationStatus getStatus() {
-        return status;
-    }
+  public ApplicationStatus getStatus() {
+    return status;
+  }
 
-    public Integer getSalary() {
-        return salary;
-    }
+  public Integer getSalary() {
+    return salary;
+  }
 }
