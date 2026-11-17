@@ -62,4 +62,18 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     problem.setTitle("Invalid sort parameter");
     return problem;
   }
+
+  @ExceptionHandler(EmailAlreadyUsedException.class)
+  public ProblemDetail handleEmailAlreadyUsed(EmailAlreadyUsedException ex) {
+    ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, ex.getMessage());
+    problem.setTitle("Email already registered");
+    return problem;
+  }
+
+  @ExceptionHandler(InvalidCredentialsException.class)
+  public ProblemDetail handleInvalidCredentials(InvalidCredentialsException ex) {
+    ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED, ex.getMessage());
+    problem.setTitle("Authentication failed");
+    return problem;
+  }
 }
