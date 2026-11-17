@@ -27,10 +27,15 @@ public class JobApplication {
 
   private Integer salary;
 
+  @ManyToOne(fetch = FetchType.LAZY, optional = false)
+  @JoinColumn(name = "user_id", nullable = false, updatable = false)
+  private User owner;
+
   protected JobApplication() {
   }
 
-  public JobApplication(String company, String position, ApplicationStatus status, Integer salary) {
+  public JobApplication(User owner, String company, String position, ApplicationStatus status, Integer salary) {
+    this.owner = owner;
     this.company = company;
     this.position = position;
     this.status = status;

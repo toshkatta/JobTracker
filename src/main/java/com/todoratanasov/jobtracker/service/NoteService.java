@@ -20,8 +20,8 @@ public class NoteService {
   private final NoteRepository noteRepository;
   private final JobApplicationRepository jobApplicationRepository;
 
-  private JobApplication getJobApplicationOrThrow(UUID jobApplicationId) {
-    return jobApplicationRepository.findById(jobApplicationId)
+  private JobApplication getJobApplicationOrThrow(UUID ownerId, UUID jobApplicationId) {
+    return jobApplicationRepository.findByIdAndOwnerId(jobApplicationId, ownerId)
         .orElseThrow(() -> new ApplicationNotFoundException(jobApplicationId));
   }
 
@@ -31,22 +31,23 @@ public class NoteService {
   }
 
   @Transactional(readOnly = true)
-  public List<NoteResponse> findAll(UUID jobApplicationId) {
-    getJobApplicationOrThrow(jobApplicationId);
+  public List<NoteResponse> findAll(UUID ownerId, UUID jobApplicationId) {
+    getJobApplicationOrThrow(ownerId, jobApplicationId);
     return noteRepository.findByJobApplicationIdOrderByCreatedAtAsc((jobApplicationId)).stream()
         .map(NoteResponse::from)
         .toList();
   }
 
   @Transactional
-  public NoteResponse create(UUID jobApplicationId, NoteRequest request) {
-    var application = getJobApplicationOrThrow(jobApplicationId);
+  public NoteResponse create(UUID ownerId, UUID jobApplicationId, NoteRequest request) {
+    var application = getJobApplicationOrThrow(ownerId, jobApplicationId);
     var note = new Note(application, request.content(), request.important());
     return NoteResponse.from(noteRepository.save(note));
   }
 
   @Transactional
-  public void delete(UUID jobApplicationId, UUID noteId) {
+  public void delete(UUID ownerId, UUID jobApplicationId, UUID noteId) {
+    getJobApplicationOrThrow(ownerId, jobApplicationId);
     var note = noteRepository.findByIdAndJobApplicationId(noteId, jobApplicationId)
         .orElseThrow(() -> new NoteNotFoundException(noteId));
     noteRepository.delete(note);

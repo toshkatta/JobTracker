@@ -2,10 +2,13 @@ package com.todoratanasov.jobtracker.controller;
 
 import com.todoratanasov.jobtracker.model.NoteRequest;
 import com.todoratanasov.jobtracker.model.NoteResponse;
+import com.todoratanasov.jobtracker.security.AuthenticatedUser;
 import com.todoratanasov.jobtracker.service.NoteService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -23,16 +26,20 @@ public class NoteController {
   }
 
   @GetMapping
-  public List<NoteResponse> list(@PathVariable UUID jobApplicationId) {
-    return service.findAll(jobApplicationId);
+  public List<NoteResponse> list(
+      @AuthenticationPrincipal Jwt jwt,
+      @PathVariable UUID jobApplicationId
+  ) {
+    return service.findAll(AuthenticatedUser.id(jwt), jobApplicationId);
   }
 
   @PostMapping
   public ResponseEntity<NoteResponse> create(
+      @AuthenticationPrincipal Jwt jwt,
       @PathVariable UUID jobApplicationId,
       @Valid @RequestBody NoteRequest request
   ) {
-    var created = service.create(jobApplicationId, request);
+    var created = service.create(AuthenticatedUser.id(jwt), jobApplicationId, request);
     var location = ServletUriComponentsBuilder.fromCurrentRequest()
         .path("/{id}")
         .buildAndExpand(created.id())
@@ -42,7 +49,11 @@ public class NoteController {
 
   @DeleteMapping("/{noteId}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
-  public void delete(@PathVariable UUID jobApplicationId, @PathVariable UUID noteId) {
-    service.delete(jobApplicationId, noteId);
+  public void delete(
+      @AuthenticationPrincipal Jwt jwt,
+      @PathVariable UUID jobApplicationId,
+      @PathVariable UUID noteId
+  ) {
+    service.delete(AuthenticatedUser.id(jwt), jobApplicationId, noteId);
   }
 }

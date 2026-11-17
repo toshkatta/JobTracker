@@ -7,6 +7,8 @@ import com.todoratanasov.jobtracker.model.ApplicationStatus;
 import com.todoratanasov.jobtracker.model.JobApplicationRequest;
 import com.todoratanasov.jobtracker.model.JobApplicationResponse;
 import com.todoratanasov.jobtracker.repository.JobApplicationRepository;
+import com.todoratanasov.jobtracker.repository.UserRepository;
+
 import jakarta.annotation.Nullable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -26,19 +28,21 @@ public class JobApplicationService {
       .map(RecordComponent::getName)
       .collect(Collectors.toUnmodifiableSet());
 
-  private final JobApplicationRepository repository;
+  private final JobApplicationRepository jobApplicationRepository;
+  private final UserRepository userRepository;
 
-  private JobApplication getJobApplicationOrThrow(UUID id) {
-    return repository.findById(id)
+  private JobApplication getJobApplicationOrThrow(UUID ownerId, UUID id) {
+    return jobApplicationRepository.findByIdAndOwnerId(id, ownerId)
         .orElseThrow(() -> new ApplicationNotFoundException(id));
   }
 
-  public JobApplicationService(JobApplicationRepository repository) {
-    this.repository = repository;
+  public JobApplicationService(JobApplicationRepository jobApplicationRepository, UserRepository userRepository) {
+    this.jobApplicationRepository = jobApplicationRepository;
+    this.userRepository = userRepository;
   }
 
   @Transactional(readOnly = true)
-  public Page<JobApplicationResponse> findAll(@Nullable ApplicationStatus status, Pageable pageable) {
+  public Page<JobApplicationResponse> findAll(UUID ownerId, @Nullable ApplicationStatus status, Pageable pageable) {
     pageable.getSort().forEach(order -> {
       if (!SORTABLE_FIELDS.contains(order.getProperty())) {
         throw new InvalidSortException(order.getProperty());
@@ -46,32 +50,34 @@ public class JobApplicationService {
     });
 
     Page<JobApplication> page = (status == null)
-        ? repository.findAll(pageable)
-        : repository.findByStatus(status, pageable);
+        ? jobApplicationRepository.findByOwnerId(ownerId, pageable)
+        : jobApplicationRepository.findByOwnerIdAndStatus(ownerId, status, pageable);
 
     return page.map(JobApplicationResponse::from);
   }
 
   @Transactional(readOnly = true)
-  public JobApplicationResponse getById(UUID id) {
-    return JobApplicationResponse.from(getJobApplicationOrThrow(id));
+  public JobApplicationResponse getById(UUID ownerId, UUID id) {
+    return JobApplicationResponse.from(getJobApplicationOrThrow(ownerId, id));
   }
 
   @Transactional
-  public JobApplicationResponse create(JobApplicationRequest request) {
+  public JobApplicationResponse create(UUID ownerId, JobApplicationRequest request) {
+    var owner = userRepository.getReferenceById(ownerId);
     var entity = new JobApplication(
+        owner,
         request.company(),
         request.position(),
         request.status(),
         request.salary()
     );
 
-    return JobApplicationResponse.from(repository.save(entity));
+    return JobApplicationResponse.from(jobApplicationRepository.save(entity));
   }
 
   @Transactional
-  public JobApplicationResponse update(UUID id, JobApplicationRequest request) {
-    var entity = getJobApplicationOrThrow(id);
+  public JobApplicationResponse update(UUID ownerId, UUID id, JobApplicationRequest request) {
+    var entity = getJobApplicationOrThrow(ownerId, id);
     entity.update(
         request.company(),
         request.position(),
@@ -82,10 +88,7 @@ public class JobApplicationService {
   }
 
   @Transactional
-  public void delete(UUID id) {
-    if (!repository.existsById(id)) {
-      throw new ApplicationNotFoundException(id);
-    }
-    repository.deleteById(id);
+  public void delete(UUID ownerId, UUID id) {
+    jobApplicationRepository.delete(getJobApplicationOrThrow(ownerId, id));
   }
 }
