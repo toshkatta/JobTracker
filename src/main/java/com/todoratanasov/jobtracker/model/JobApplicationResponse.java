@@ -2,7 +2,11 @@ package com.todoratanasov.jobtracker.model;
 
 import com.todoratanasov.jobtracker.entity.JobApplication;
 
+import java.lang.reflect.RecordComponent;
+import java.util.Arrays;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 public record JobApplicationResponse(
     UUID id,
@@ -20,4 +24,8 @@ public record JobApplicationResponse(
         entity.getSalary()
     );
   }
+
+  public static final Set<String> SORTABLE_FIELDS = Arrays.stream(JobApplicationResponse.class.getRecordComponents())
+      .map(RecordComponent::getName)
+      .collect(Collectors.toUnmodifiableSet());
 }
