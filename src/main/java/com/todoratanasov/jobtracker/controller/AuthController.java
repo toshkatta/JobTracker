@@ -23,15 +23,15 @@ public class AuthController {
     this.service = service;
   }
 
-  @PostMapping("/register")
+  @PostMapping(ApiPaths.REGISTER)
   @ResponseStatus(HttpStatus.CREATED)
   public UserResponse register(@Valid @RequestBody RegisterRequest request) {
-      return service.register(request);
+    return service.register(request);
   }
 
-  @PostMapping("/login")
+  @PostMapping(ApiPaths.LOGIN)
   public TokenResponse login(@Valid @RequestBody LoginRequest request) {
-      return service.login(request);
+    return service.login(request);
   }
-  
+
 }

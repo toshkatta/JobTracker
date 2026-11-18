@@ -7,6 +7,8 @@ public final class ApiPaths {
   public static final String APPLICATIONS = "/applications";
   public static final String APPLICATION_NOTES = APPLICATIONS + "/{jobApplicationId}/notes";
   public static final String AUTH = "/auth";
+  public static final String REGISTER = "/register";
+  public static final String LOGIN = "/login";
 
   private ApiPaths() {
   }
