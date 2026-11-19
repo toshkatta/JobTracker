@@ -30,7 +30,7 @@ public class NotesApiTest extends AbstractIntegrationTest {
     jobApplications = new JobApplicationClient(mockMvc, jsonMapper);
   }
 
-  private NoteBody createNote(TestUser user, UUID jobApplicationId, String content, Boolean important)
+  private NoteBody createNote(TestUser user, UUID jobApplicationId, String content, boolean important)
       throws Exception {
     return readBody(
         mockMvc.perform(
@@ -42,6 +42,17 @@ public class NotesApiTest extends AbstractIntegrationTest {
         )
             .andExpect(status().isCreated()),
         NoteBody.class
+    );
+  }
+
+  private NoteBody[] listNotes(TestUser user, UUID jobApplicationId) throws Exception {
+    return readBody(
+        mockMvc.perform(
+            get(NOTES_URL, jobApplicationId)
+                .header(HttpHeaders.AUTHORIZATION, user.authorization())
+        )
+            .andExpect(status().isOk()),
+        NoteBody[].class
     );
   }
 
@@ -57,16 +68,7 @@ public class NotesApiTest extends AbstractIntegrationTest {
     assertThat(created.id()).isNotNull();
     assertThat(created).isEqualTo(new NoteBody(created.id(), billa.id(), noteBody, isNoteImportant));
 
-    var fetched = readBody(
-        mockMvc.perform(
-            get(NOTES_URL, billa.id())
-                .header(HttpHeaders.AUTHORIZATION, user.authorization())
-        )
-            .andExpect(status().isOk()),
-        NoteBody[].class
-    );
-
-    assertThat(fetched).containsExactly(created);
+    assertThat(listNotes(user, billa.id())).containsExactly(created);
   }
 
   @Test
@@ -77,14 +79,7 @@ public class NotesApiTest extends AbstractIntegrationTest {
     NoteBody secondNote = createNote(user, dayAndNight.id(), "Test second note", true);
     NoteBody thirdNote = createNote(user, dayAndNight.id(), "Test third note", false);
 
-    var notes = readBody(
-        mockMvc.perform(
-            get(NOTES_URL, dayAndNight.id())
-                .header(HttpHeaders.AUTHORIZATION, user.authorization())
-        )
-            .andExpect(status().isOk()),
-        NoteBody[].class
-    );
+    var notes = listNotes(user, dayAndNight.id());
 
     assertThat(notes).containsExactly(firstNote, secondNote, thirdNote);
     assertThat(notes).hasSize(3);
@@ -98,14 +93,7 @@ public class NotesApiTest extends AbstractIntegrationTest {
     NoteBody secondNote = createNote(user, olympus.id(), "Test second note", false);
     NoteBody thirdNote = createNote(user, olympus.id(), "Test third note", false);
 
-    var notesBeforeDelete = readBody(
-        mockMvc.perform(
-            get(NOTES_URL, olympus.id())
-                .header(HttpHeaders.AUTHORIZATION, user.authorization())
-        )
-            .andExpect(status().isOk()),
-        NoteBody[].class
-    );
+    var notesBeforeDelete = listNotes(user, olympus.id());
 
     assertThat(notesBeforeDelete).containsExactlyInAnyOrder(firstNote, secondNote, thirdNote);
     assertThat(notesBeforeDelete).hasSize(3);
@@ -116,14 +104,7 @@ public class NotesApiTest extends AbstractIntegrationTest {
     )
         .andExpect(status().isNoContent());
 
-    var notesAfterDelete = readBody(
-        mockMvc.perform(
-            get(NOTES_URL, olympus.id())
-                .header(HttpHeaders.AUTHORIZATION, user.authorization())
-        )
-            .andExpect(status().isOk()),
-        NoteBody[].class
-    );
+    var notesAfterDelete = listNotes(user, olympus.id());
 
     assertThat(notesAfterDelete).containsExactlyInAnyOrder(firstNote, thirdNote);
     assertThat(notesAfterDelete).hasSize(2);
@@ -189,7 +170,7 @@ public class NotesApiTest extends AbstractIntegrationTest {
         NoteBody.class
     );
 
-    assertThat(note.important()).isEqualTo(false);
+    assertThat(note.important()).isFalse();
   }
 
   @Test
@@ -239,16 +220,7 @@ public class NotesApiTest extends AbstractIntegrationTest {
     )
         .andExpect(status().isNotFound());
 
-    var originalNotes = readBody(
-        mockMvc.perform(
-            get(NOTES_URL, mazda.id())
-                .header(HttpHeaders.AUTHORIZATION, owner.authorization())
-        )
-            .andExpect(status().isOk()),
-        NoteBody[].class
-    );
-
-    assertThat(originalNotes).containsExactly(importantNote, unimportantNote);
+    assertThat(listNotes(owner, mazda.id())).containsExactly(importantNote, unimportantNote);
   }
 
   @Test
@@ -269,25 +241,7 @@ public class NotesApiTest extends AbstractIntegrationTest {
     )
         .andExpect(status().isNotFound());
 
-    var originalSuzukiNotes = readBody(
-        mockMvc.perform(
-            get(NOTES_URL, suzuki.id())
-                .header(HttpHeaders.AUTHORIZATION, owner.authorization())
-        )
-            .andExpect(status().isOk()),
-        NoteBody[].class
-    );
-
-    assertThat(originalSuzukiNotes).containsExactly(suzukiNote);
-
-    var originalYamahaNotes = readBody(
-        mockMvc.perform(
-            get(NOTES_URL, yamaha.id())
-                .header(HttpHeaders.AUTHORIZATION, owner.authorization())
-        )
-            .andExpect(status().isOk()),
-        NoteBody[].class
-    );
-    assertThat(originalYamahaNotes).containsExactly(yamahaNote);
+    assertThat(listNotes(owner, suzuki.id())).containsExactly(suzukiNote);
+    assertThat(listNotes(owner, yamaha.id())).containsExactly(yamahaNote);
   }
 }

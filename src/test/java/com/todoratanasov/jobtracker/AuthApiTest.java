@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.Locale;
 import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
@@ -19,7 +20,7 @@ public class AuthApiTest extends AbstractIntegrationTest {
   }
 
   @Test
-  void register_withDuplicteEmail_returns409() throws Exception {
+  void register_withDuplicateEmail_returns409() throws Exception {
     String body = credentials(UUID.randomUUID() + "@example.com", PASSWORD);
 
     mockMvc.perform(post(REGISTER_URL).contentType(MediaType.APPLICATION_JSON).content(body))
@@ -30,14 +31,15 @@ public class AuthApiTest extends AbstractIntegrationTest {
   }
 
   @Test
-  void register_withDuplicteNormalizedEmail_returns409() throws Exception {
-    String uppercaseEmail = credentials("A@x.com", PASSWORD);
-    String lowercaseEmail = credentials("a@x.com", PASSWORD);
+  void register_withDuplicateNormalizedEmail_returns409() throws Exception {
+    String email = UUID.randomUUID() + "@example.com";
+    String lowercaseEmailBody = credentials(email, PASSWORD);
+    String uppercaseEmailBody = credentials(email.toUpperCase(Locale.ROOT), PASSWORD);
 
-    mockMvc.perform(post(REGISTER_URL).contentType(MediaType.APPLICATION_JSON).content(uppercaseEmail))
+    mockMvc.perform(post(REGISTER_URL).contentType(MediaType.APPLICATION_JSON).content(lowercaseEmailBody))
         .andExpect(status().isCreated());
 
-    mockMvc.perform(post(REGISTER_URL).contentType(MediaType.APPLICATION_JSON).content(lowercaseEmail))
+    mockMvc.perform(post(REGISTER_URL).contentType(MediaType.APPLICATION_JSON).content(uppercaseEmailBody))
         .andExpect(status().isConflict());
   }
 
