@@ -41,7 +41,7 @@ public class NoteService {
   @Transactional
   public NoteResponse create(UUID ownerId, UUID jobApplicationId, NoteRequest request) {
     var application = getJobApplicationOrThrow(ownerId, jobApplicationId);
-    var note = new Note(application, request.content(), request.important());
+    var note = new Note(application, request.content(), Boolean.TRUE.equals(request.important()));
     return NoteResponse.from(noteRepository.save(note));
   }
 
