@@ -28,7 +28,8 @@ public class User {
   @Column(nullable = false, updatable = false)
   private Instant createdAt;
 
-  protected User() {}
+  protected User() {
+  }
 
   public User(String email, String passwordHash) {
     this.email = email;
@@ -36,8 +37,19 @@ public class User {
     this.createdAt = Instant.now();
   }
 
-  public UUID getId() { return id; }
-  public String getEmail() { return email; }
-  public String getPasswordHash() { return passwordHash; }
-  public Instant getCreatedAt() { return createdAt; }
+  public UUID getId() {
+    return id;
+  }
+
+  public String getEmail() {
+    return email;
+  }
+
+  public String getPasswordHash() {
+    return passwordHash;
+  }
+
+  public Instant getCreatedAt() {
+    return createdAt;
+  }
 }

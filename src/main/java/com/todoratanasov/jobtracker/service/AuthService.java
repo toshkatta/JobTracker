@@ -15,7 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Locale;
 
-@Service 
+@Service
 public class AuthService {
 
   private final UserRepository userRepository;
@@ -30,7 +30,7 @@ public class AuthService {
     this.dummyHash = passwordEncoder.encode("not-a-real-password");
   }
 
-  @Transactional 
+  @Transactional
   public UserResponse register(RegisterRequest request) {
     String email = request.email().trim().toLowerCase(Locale.ROOT);
     if (userRepository.existsByEmail(email)) {

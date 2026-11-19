@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 import com.todoratanasov.jobtracker.config.JwtProperties;
 import com.todoratanasov.jobtracker.entity.User;
 
-@Service 
+@Service
 public class JwtService {
 
   private final JwtEncoder encoder;
@@ -27,11 +27,11 @@ public class JwtService {
   public String issue(User user) {
     Instant now = Instant.now();
     JwtClaimsSet claims = JwtClaimsSet.builder()
-      .issuer("jobtracker")
-      .subject(user.getId().toString())
-      .issuedAt(now)
-      .expiresAt(now.plus(ttl))
-      .build();
+        .issuer("jobtracker")
+        .subject(user.getId().toString())
+        .issuedAt(now)
+        .expiresAt(now.plus(ttl))
+        .build();
     JwsHeader header = JwsHeader.with(MacAlgorithm.HS256).build();
     return encoder.encode(JwtEncoderParameters.from(header, claims)).getTokenValue();
   }

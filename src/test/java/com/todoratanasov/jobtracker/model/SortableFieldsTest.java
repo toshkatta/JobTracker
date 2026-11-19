@@ -11,11 +11,11 @@ import com.todoratanasov.jobtracker.entity.JobApplication;
 
 public class SortableFieldsTest {
 
-    void everySortableFieldExistsOnTheEntity() {
-        Set<String> entityFields = Arrays.stream(JobApplication.class.getDeclaredFields())
-                .map(Field::getName)
-                .collect(Collectors.toSet());
+  void everySortableFieldExistsOnTheEntity() {
+    Set<String> entityFields = Arrays.stream(JobApplication.class.getDeclaredFields())
+        .map(Field::getName)
+        .collect(Collectors.toSet());
 
-        assertThat(entityFields).containsAll(JobApplicationResponse.SORTABLE_FIELDS);
-    }
+    assertThat(entityFields).containsAll(JobApplicationResponse.SORTABLE_FIELDS);
+  }
 }

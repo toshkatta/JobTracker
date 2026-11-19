@@ -25,53 +25,53 @@ import tools.jackson.databind.json.JsonMapper;
 @AutoConfigureMockMvc
 abstract class AbstractIntegrationTest {
 
-    protected static final String HEALTH_URL = ApiPaths.API_PREFIX + ApiPaths.HEALTH;
-    protected static final String REGISTER_URL = ApiPaths.API_PREFIX + ApiPaths.AUTH + ApiPaths.REGISTER;
-    protected static final String LOGIN_URL = ApiPaths.API_PREFIX + ApiPaths.AUTH + ApiPaths.LOGIN;
+  protected static final String HEALTH_URL = ApiPaths.API_PREFIX + ApiPaths.HEALTH;
+  protected static final String REGISTER_URL = ApiPaths.API_PREFIX + ApiPaths.AUTH + ApiPaths.REGISTER;
+  protected static final String LOGIN_URL = ApiPaths.API_PREFIX + ApiPaths.AUTH + ApiPaths.LOGIN;
 
-    // Test-local views of the JSON the API returns. Deliberately NOT the production DTOs,
-    // so a renamed field in the real response makes these tests fail.
-    record TokenBody(String accessToken) {
-    }
+  // Test-local views of the JSON the API returns. Deliberately NOT the production DTOs,
+  // so a renamed field in the real response makes these tests fail.
+  record TokenBody(String accessToken) {
+  }
 
-    record FieldErrorBody(String field, String message) {
-    }
+  record FieldErrorBody(String field, String message) {
+  }
 
-    record ErrorBody(String title, String detail, List<FieldErrorBody> errors) {
-    }
+  record ErrorBody(String title, String detail, List<FieldErrorBody> errors) {
+  }
 
-    @ServiceConnection
-    static final PostgreSQLContainer postgres = new PostgreSQLContainer("postgres:18");
+  @ServiceConnection
+  static final PostgreSQLContainer postgres = new PostgreSQLContainer("postgres:18");
 
-    static {
-        postgres.start();
-    }
+  static {
+    postgres.start();
+  }
 
-    @Autowired
-    protected MockMvc mockMvc;
+  @Autowired
+  protected MockMvc mockMvc;
 
-    @Autowired
-    protected JsonMapper jsonMapper;
+  @Autowired
+  protected JsonMapper jsonMapper;
 
-    protected <T> T readBody(ResultActions result, Class<T> type) throws Exception {
-        return jsonMapper.readValue(result.andReturn().getResponse().getContentAsString(), type);
-    }
+  protected <T> T readBody(ResultActions result, Class<T> type) throws Exception {
+    return jsonMapper.readValue(result.andReturn().getResponse().getContentAsString(), type);
+  }
 
-    protected TestUser registerAndLogin() throws Exception {
-        String email = UUID.randomUUID() + "@example.com";
-        String credentials = """
-                {"email": "%s", "password": "Asd-qwe-123"}"""
-                .formatted(email);
+  protected TestUser registerAndLogin() throws Exception {
+    String email = UUID.randomUUID() + "@example.com";
+    String credentials = """
+        {"email": "%s", "password": "Asd-qwe-123"}"""
+        .formatted(email);
 
-        mockMvc.perform(post(REGISTER_URL).contentType(MediaType.APPLICATION_JSON).content(credentials))
-                .andExpect(status().isCreated());
+    mockMvc.perform(post(REGISTER_URL).contentType(MediaType.APPLICATION_JSON).content(credentials))
+        .andExpect(status().isCreated());
 
-        TokenBody token = readBody(
-                mockMvc.perform(post(LOGIN_URL).contentType(MediaType.APPLICATION_JSON).content(credentials))
-                        .andExpect(status().isOk()),
-                TokenBody.class
-        );
+    TokenBody token = readBody(
+        mockMvc.perform(post(LOGIN_URL).contentType(MediaType.APPLICATION_JSON).content(credentials))
+            .andExpect(status().isOk()),
+        TokenBody.class
+    );
 
-        return new TestUser(email, token.accessToken());
-    }
+    return new TestUser(email, token.accessToken());
+  }
 }
