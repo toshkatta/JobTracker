@@ -1,7 +1,7 @@
 package com.todoratanasov.jobtracker.repository;
 
 import com.todoratanasov.jobtracker.entity.JobApplication;
-import com.todoratanasov.jobtracker.model.ApplicationStatus;
+import com.todoratanasov.jobtracker.model.JobApplicationStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -13,7 +13,7 @@ public interface JobApplicationRepository extends JpaRepository<JobApplication, 
 
   Page<JobApplication> findByOwnerId(UUID ownerId, Pageable pageable);
 
-  Page<JobApplication> findByOwnerIdAndStatus(UUID ownerId, ApplicationStatus status, Pageable pageable);
+  Page<JobApplication> findByOwnerIdAndStatus(UUID ownerId, JobApplicationStatus status, Pageable pageable);
 
   Optional<JobApplication> findByIdAndOwnerId(UUID id, UUID ownerId);
 }

@@ -1,6 +1,6 @@
 package com.todoratanasov.jobtracker.entity;
 
-import com.todoratanasov.jobtracker.model.ApplicationStatus;
+import com.todoratanasov.jobtracker.model.JobApplicationStatus;
 import jakarta.persistence.*;
 import org.hibernate.annotations.UuidGenerator;
 
@@ -23,7 +23,7 @@ public class JobApplication {
 
   @Enumerated(EnumType.STRING)
   @Column(nullable = false, length = 20)
-  private ApplicationStatus status;
+  private JobApplicationStatus status;
 
   private Integer salary;
 
@@ -34,7 +34,7 @@ public class JobApplication {
   protected JobApplication() {
   }
 
-  public JobApplication(User owner, String company, String position, ApplicationStatus status, Integer salary) {
+  public JobApplication(User owner, String company, String position, JobApplicationStatus status, Integer salary) {
     this.owner = owner;
     this.company = company;
     this.position = position;
@@ -42,7 +42,7 @@ public class JobApplication {
     this.salary = salary;
   }
 
-  public void update(String company, String position, ApplicationStatus status, Integer salary) {
+  public void update(String company, String position, JobApplicationStatus status, Integer salary) {
     this.company = company;
     this.position = position;
     this.status = status;
@@ -61,7 +61,7 @@ public class JobApplication {
     return position;
   }
 
-  public ApplicationStatus getStatus() {
+  public JobApplicationStatus getStatus() {
     return status;
   }
 

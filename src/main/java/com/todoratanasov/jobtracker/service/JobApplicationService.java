@@ -3,7 +3,7 @@ package com.todoratanasov.jobtracker.service;
 import com.todoratanasov.jobtracker.entity.JobApplication;
 import com.todoratanasov.jobtracker.error.ApplicationNotFoundException;
 import com.todoratanasov.jobtracker.error.InvalidSortException;
-import com.todoratanasov.jobtracker.model.ApplicationStatus;
+import com.todoratanasov.jobtracker.model.JobApplicationStatus;
 import com.todoratanasov.jobtracker.model.JobApplicationRequest;
 import com.todoratanasov.jobtracker.model.JobApplicationResponse;
 import com.todoratanasov.jobtracker.repository.JobApplicationRepository;
@@ -34,7 +34,7 @@ public class JobApplicationService {
   }
 
   @Transactional(readOnly = true)
-  public Page<JobApplicationResponse> findAll(UUID ownerId, @Nullable ApplicationStatus status, Pageable pageable) {
+  public Page<JobApplicationResponse> findAll(UUID ownerId, @Nullable JobApplicationStatus status, Pageable pageable) {
     pageable.getSort().forEach(order -> {
       if (!JobApplicationResponse.SORTABLE_FIELDS.contains(order.getProperty())) {
         throw new InvalidSortException(order.getProperty());

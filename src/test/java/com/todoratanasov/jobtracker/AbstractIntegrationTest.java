@@ -11,7 +11,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
-import org.springframework.http.HttpHeaders;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -29,33 +28,16 @@ abstract class AbstractIntegrationTest {
     protected static final String HEALTH_URL = ApiPaths.API_PREFIX + ApiPaths.HEALTH;
     protected static final String REGISTER_URL = ApiPaths.API_PREFIX + ApiPaths.AUTH + ApiPaths.REGISTER;
     protected static final String LOGIN_URL = ApiPaths.API_PREFIX + ApiPaths.AUTH + ApiPaths.LOGIN;
-    protected static final String APPLICATIONS_URL = ApiPaths.API_PREFIX + ApiPaths.APPLICATIONS;
-    protected static final String APPLICATION_NOTES_URL = ApiPaths.API_PREFIX + ApiPaths.APPLICATION_NOTES;
 
     // Test-local views of the JSON the API returns. Deliberately NOT the production DTOs,
     // so a renamed field in the real response makes these tests fail.
     record TokenBody(String accessToken) {
     }
 
-    record ApplicationBody(UUID id, String company, String position, String status, Integer salary) {
-    }
-
-    record PageInfo(int size, int number, long totalElements, int totalPages) {
-    }
-
-    record PageBody(List<ApplicationBody> content, PageInfo page) {
-    }
-
     record FieldErrorBody(String field, String message) {
     }
 
     record ErrorBody(String title, String detail, List<FieldErrorBody> errors) {
-    }
-
-    record TestUser(String email, String token) {
-        String authorization() {
-            return "Bearer " + token;
-        }
     }
 
     @ServiceConnection
@@ -91,22 +73,5 @@ abstract class AbstractIntegrationTest {
         );
 
         return new TestUser(email, token.accessToken());
-    }
-
-    protected ApplicationBody craeteApplication(TestUser user, String company) throws Exception {
-        return readBody(
-                mockMvc.perform(
-                        post(APPLICATIONS_URL)
-                                .header(HttpHeaders.AUTHORIZATION, user.authorization())
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(
-                                        """
-                                                {"company": "%s", "position": "Dev", "status": "APPLIED", "salary": 5000}"""
-                                                .formatted(company)
-                                )
-                )
-                        .andExpect(status().isCreated()),
-                ApplicationBody.class
-        );
     }
 }

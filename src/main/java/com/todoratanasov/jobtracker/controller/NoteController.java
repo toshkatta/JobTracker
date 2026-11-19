@@ -6,17 +6,15 @@ import com.todoratanasov.jobtracker.security.AuthenticatedUser;
 import com.todoratanasov.jobtracker.service.NoteService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping(ApiPaths.APPLICATION_NOTES)
+@RequestMapping(ApiPaths.JOB_APPLICATION_NOTES)
 public class NoteController {
 
   private final NoteService service;
@@ -34,17 +32,13 @@ public class NoteController {
   }
 
   @PostMapping
-  public ResponseEntity<NoteResponse> create(
+  @ResponseStatus(HttpStatus.CREATED)
+  public NoteResponse create(
       @AuthenticationPrincipal Jwt jwt,
       @PathVariable UUID jobApplicationId,
       @Valid @RequestBody NoteRequest request
   ) {
-    var created = service.create(AuthenticatedUser.id(jwt), jobApplicationId, request);
-    var location = ServletUriComponentsBuilder.fromCurrentRequest()
-        .path("/{id}")
-        .buildAndExpand(created.id())
-        .toUri();
-    return ResponseEntity.created(location).body(created);
+    return service.create(AuthenticatedUser.id(jwt), jobApplicationId, request);
   }
 
   @DeleteMapping("/{noteId}")

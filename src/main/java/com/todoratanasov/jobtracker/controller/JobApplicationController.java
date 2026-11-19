@@ -1,6 +1,6 @@
 package com.todoratanasov.jobtracker.controller;
 
-import com.todoratanasov.jobtracker.model.ApplicationStatus;
+import com.todoratanasov.jobtracker.model.JobApplicationStatus;
 import com.todoratanasov.jobtracker.model.JobApplicationRequest;
 import com.todoratanasov.jobtracker.model.JobApplicationResponse;
 import com.todoratanasov.jobtracker.security.AuthenticatedUser;
@@ -19,7 +19,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.util.UUID;
 
 @RestController
-@RequestMapping(ApiPaths.APPLICATIONS)
+@RequestMapping(ApiPaths.JOB_APPLICATIONS)
 public class JobApplicationController {
 
   private final JobApplicationService service;
@@ -31,7 +31,7 @@ public class JobApplicationController {
   @GetMapping
   public PagedModel<JobApplicationResponse> list(
       @AuthenticationPrincipal Jwt jwt,
-      @RequestParam(required = false) ApplicationStatus status,
+      @RequestParam(required = false) JobApplicationStatus status,
       @SortDefault(sort = "id") Pageable pageable
   ) {
     return new PagedModel<>(service.findAll(AuthenticatedUser.id(jwt), status, pageable));

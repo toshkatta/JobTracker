@@ -22,7 +22,7 @@ import org.springframework.data.domain.Sort;
 import com.todoratanasov.jobtracker.entity.JobApplication;
 import com.todoratanasov.jobtracker.entity.User;
 import com.todoratanasov.jobtracker.error.InvalidSortException;
-import com.todoratanasov.jobtracker.model.ApplicationStatus;
+import com.todoratanasov.jobtracker.model.JobApplicationStatus;
 import com.todoratanasov.jobtracker.model.JobApplicationRequest;
 import com.todoratanasov.jobtracker.repository.JobApplicationRepository;
 import com.todoratanasov.jobtracker.repository.UserRepository;
@@ -40,20 +40,20 @@ public class JobApplicationServiceTest {
   private JobApplicationService service;
 
   private final UUID ownerId = UUID.randomUUID();
-  private final UUID applicationId = UUID.randomUUID();
+  private final UUID jobApplicationId = UUID.randomUUID();
 
   @Test
   void update_changesTheFields_withoutCallingSave() {
     var owner = new User("asd@qwe.com", "hash");
-    var entity = new JobApplication(owner, "Acme", "Dev", ApplicationStatus.APPLIED, 1000);
-    when(repository.findByIdAndOwnerId(applicationId, ownerId)).thenReturn(Optional.of(entity));
+    var entity = new JobApplication(owner, "Acme", "Dev", JobApplicationStatus.APPLIED, 1000);
+    when(repository.findByIdAndOwnerId(jobApplicationId, ownerId)).thenReturn(Optional.of(entity));
 
-    var request = new JobApplicationRequest("Planet Fitness", "instructor", ApplicationStatus.INTERVIEW, 2000);
-    var response = service.update(ownerId, applicationId, request);
+    var request = new JobApplicationRequest("Planet Fitness", "instructor", JobApplicationStatus.INTERVIEW, 2000);
+    var response = service.update(ownerId, jobApplicationId, request);
 
     assertThat(response.company()).isEqualTo("Planet Fitness");
     assertThat(response.position()).isEqualTo("instructor");
-    assertThat(response.status()).isEqualTo(ApplicationStatus.INTERVIEW);
+    assertThat(response.status()).isEqualTo(JobApplicationStatus.INTERVIEW);
     assertThat(response.salary()).isEqualTo(2000);
     verify(repository, never()).save(any());
   }
