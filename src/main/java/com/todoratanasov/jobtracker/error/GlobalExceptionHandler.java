@@ -1,6 +1,6 @@
 package com.todoratanasov.jobtracker.error;
 
-import jakarta.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.jspecify.annotations.NullMarked;
 import org.springframework.http.*;
 import org.springframework.web.bind.MethodArgumentNotValidException;

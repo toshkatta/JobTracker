@@ -50,7 +50,7 @@ public class RefreshTokenService {
   }
 
   public record Rotation(User user, String refreshToken) {
-  };
+  }
 
   /** A new login starts a new family. Returns the raw token, which is never stored. */
   public String issueTokenForNewLogin(User user) {

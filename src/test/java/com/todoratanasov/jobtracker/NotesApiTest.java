@@ -202,6 +202,62 @@ public class NotesApiTest extends AbstractIntegrationTest {
   }
 
   @Test
+  void create_withContentAtMaxLength_succeeds_andIsStoredInFull() throws Exception {
+    TestUser user = registerAndLogin();
+    JobApplicationBody kawasaki = jobApplications.create(user, "Kawasaki");
+    String maxLengthContent = "a".repeat(2000);
+
+    NoteBody created = createNote(user, kawasaki.id(), maxLengthContent, false);
+
+    assertThat(created.content()).hasSize(2000);
+
+    var notes = readBody(
+        mockMvc.perform(
+            get(NOTES_URL, kawasaki.id())
+                .header(HttpHeaders.AUTHORIZATION, user.authorization())
+        )
+            .andExpect(status().isOk()),
+        NoteBody[].class
+    );
+
+    assertThat(notes).containsExactly(created);
+  }
+
+  @Test
+  void create_withContentOverMaxLength_returns400_andStoresNothing() throws Exception {
+    TestUser user = registerAndLogin();
+    JobApplicationBody kawasaki = jobApplications.create(user, "Kawasaki");
+    String tooLongContent = "a".repeat(2001);
+
+    ErrorBody error = readBody(
+        mockMvc.perform(
+            post(NOTES_URL, kawasaki.id())
+                .header(HttpHeaders.AUTHORIZATION, user.authorization())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                    {"content": "%s", "important": false}""".formatted(tooLongContent))
+        )
+            .andExpect(status().isBadRequest()),
+        ErrorBody.class
+    );
+
+    assertThat(error.errors())
+        .extracting(FieldErrorBody::field)
+        .containsExactly("content");
+
+    var notes = readBody(
+        mockMvc.perform(
+            get(NOTES_URL, kawasaki.id())
+                .header(HttpHeaders.AUTHORIZATION, user.authorization())
+        )
+            .andExpect(status().isOk()),
+        NoteBody[].class
+    );
+
+    assertThat(notes).isEmpty();
+  }
+
+  @Test
   void delete_fromAnotherUser_returns404() throws Exception {
     TestUser owner = registerAndLogin();
     TestUser intruder = registerAndLogin();

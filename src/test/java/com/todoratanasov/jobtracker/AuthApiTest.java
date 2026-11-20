@@ -66,7 +66,7 @@ public class AuthApiTest extends AbstractIntegrationTest {
 
   @Test
   void register_withInvalidEmailAndShortPassword_returns400AndListsEmailAndPassword() throws Exception {
-    String body = credentials("not-an-email", "abc");
+    String body = credentials("not-an-email", "abc123");
 
     ErrorBody error = readBody(
         mockMvc.perform(post(REGISTER_URL).contentType(MediaType.APPLICATION_JSON).content(body))
