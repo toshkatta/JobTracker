@@ -28,10 +28,12 @@ abstract class AbstractIntegrationTest {
   protected static final String HEALTH_URL = ApiPaths.API_PREFIX + ApiPaths.HEALTH;
   protected static final String REGISTER_URL = ApiPaths.API_PREFIX + ApiPaths.AUTH + ApiPaths.REGISTER;
   protected static final String LOGIN_URL = ApiPaths.API_PREFIX + ApiPaths.AUTH + ApiPaths.LOGIN;
+  protected static final String REFRESH_URL = ApiPaths.API_PREFIX + ApiPaths.AUTH + ApiPaths.REFRESH;
+  protected static final String LOGOUT_URL = ApiPaths.API_PREFIX + ApiPaths.AUTH + ApiPaths.LOGOUT;
 
   // Test-local views of the JSON the API returns. Deliberately NOT the production DTOs,
   // so a renamed field in the real response makes these tests fail.
-  record TokenBody(String accessToken) {
+  record TokenBody(String accessToken, String refreshToken) {
   }
 
   record FieldErrorBody(String field, String message) {
@@ -72,6 +74,6 @@ abstract class AbstractIntegrationTest {
         TokenBody.class
     );
 
-    return new TestUser(email, token.accessToken());
+    return new TestUser(email, token.accessToken(), token.refreshToken());
   }
 }

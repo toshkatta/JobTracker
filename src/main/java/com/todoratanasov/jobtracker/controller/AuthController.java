@@ -1,6 +1,7 @@
 package com.todoratanasov.jobtracker.controller;
 
 import com.todoratanasov.jobtracker.model.LoginRequest;
+import com.todoratanasov.jobtracker.model.RefreshRequest;
 import com.todoratanasov.jobtracker.model.RegisterRequest;
 import com.todoratanasov.jobtracker.model.TokenResponse;
 import com.todoratanasov.jobtracker.model.UserResponse;
@@ -34,4 +35,14 @@ public class AuthController {
     return service.login(request);
   }
 
+  @PostMapping(ApiPaths.REFRESH)
+  public TokenResponse refresh(@Valid @RequestBody RefreshRequest request) {
+    return service.refresh(request);
+  }
+
+  @PostMapping(ApiPaths.LOGOUT)
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void logout(@Valid @RequestBody RefreshRequest request) {
+    service.logout(request);
+  }
 }

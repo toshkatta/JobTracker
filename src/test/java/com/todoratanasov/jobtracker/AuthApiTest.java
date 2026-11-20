@@ -1,6 +1,7 @@
 package com.todoratanasov.jobtracker;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -8,7 +9,9 @@ import java.util.Locale;
 import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.ResultActions;
 
 public class AuthApiTest extends AbstractIntegrationTest {
 
@@ -17,6 +20,24 @@ public class AuthApiTest extends AbstractIntegrationTest {
   private static String credentials(String email, String password) {
     return """
         {"email": "%s", "password": "%s"}""".formatted(email, password);
+  }
+
+  private ResultActions postRefresh(String refreshToken) throws Exception {
+    return mockMvc.perform(
+        post(REFRESH_URL)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content("""
+                {"refreshToken": "%s"}""".formatted(refreshToken))
+    );
+  }
+
+  private ResultActions postLogout(String refreshToken) throws Exception {
+    return mockMvc.perform(
+        post(LOGOUT_URL)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content("""
+                {"refreshToken": "%s"}""".formatted(refreshToken))
+    );
   }
 
   @Test
@@ -79,5 +100,59 @@ public class AuthApiTest extends AbstractIntegrationTest {
         .andReturn().getResponse().getContentAsString();
 
     assertThat(wrongPassword).isEqualTo(unknownEmail);
+  }
+
+  @Test
+  void refresh_returnsNewTokens_andTheNewAccessTokenWorks() throws Exception {
+    TestUser user = registerAndLogin();
+
+    TokenBody renewed = readBody(postRefresh(user.refreshToken()).andExpect(status().isOk()), TokenBody.class);
+
+    assertThat(renewed.refreshToken()).isNotBlank().isNotEqualTo(user.refreshToken());
+    mockMvc.perform(
+        get(JobApplicationClient.URL)
+            .header(HttpHeaders.AUTHORIZATION, "Bearer " + renewed.accessToken())
+    )
+        .andExpect(status().isOk());
+  }
+
+  @Test
+  void refresh_withAnAlreadyUsedToken_returns401() throws Exception {
+    TestUser user = registerAndLogin();
+
+    postRefresh(user.refreshToken()).andExpect(status().isOk());
+    postRefresh(user.refreshToken()).andExpect(status().isUnauthorized());
+  }
+
+  @Test
+  void refresh_reuseOfAnOldToken_revokesTheWholeFamily() throws Exception {
+    TestUser user = registerAndLogin();
+    TokenBody second = readBody(postRefresh(user.refreshToken()).andExpect(status().isOk()), TokenBody.class);
+
+    postRefresh(user.refreshToken()).andExpect(status().isUnauthorized());
+    postRefresh(second.refreshToken()).andExpect(status().isUnauthorized());
+  }
+
+  @Test
+  void refresh_withUnknownToken_returns401() throws Exception {
+    postRefresh("unknown-token").andExpect(status().isUnauthorized());
+  }
+
+  @Test
+  void logout_revokesTheRefreshToken() throws Exception {
+    TestUser user = registerAndLogin();
+
+    postLogout(user.refreshToken()).andExpect(status().isNoContent());
+    postRefresh(user.refreshToken()).andExpect(status().isUnauthorized());
+  }
+
+  @Test
+  void logout_withUnknownToken_stillReturns204() throws Exception {
+    postLogout("unknown-token").andExpect(status().isNoContent());
+  }
+
+  @Test
+  void refresh_withBlankToken_returns400() throws Exception {
+    postRefresh("").andExpect(status().isBadRequest());
   }
 }
