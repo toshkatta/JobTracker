@@ -95,18 +95,9 @@
                 <configuration>
                     <java>
                         <eclipse>
-                            <file>${project.basedir}/src/main/java/com/todoratanasov/jobtracker/config/java-formatter.xml</file>
+                            <file>${project.basedir}/config/java-formatter.xml</file>
                         </eclipse>
                     </java>
-                </configuration>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <statelessTestsetInfoReporter
-                        implementation="org.apache.maven.plugin.surefire.extensions.junit5.JUnit5StatelessTestsetInfoReporter"/>
                 </configuration>
             </plugin>
 
