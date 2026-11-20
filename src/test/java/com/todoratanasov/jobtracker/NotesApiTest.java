@@ -128,7 +128,7 @@ public class NotesApiTest extends AbstractIntegrationTest {
 
     assertThat(error.errors())
         .extracting(FieldErrorBody::field)
-        .containsExactly("content");
+        .containsExactly("nonsense");
   }
 
   @Test
