@@ -1,5 +1,7 @@
 # JobTracker API
 
+[![CI](https://github.com/toshkatta/JobTracker/actions/workflows/ci.yml/badge.svg)](https://github.com/toshkatta/JobTracker/actions/workflows/ci.yml)
+
 A REST API for tracking job applications: companies, positions, statuses, salaries and interview notes. Each user only ever sees their own data. Built with Java and Spring Boot as a backend portfolio project.
 
 ## Features
