@@ -57,7 +57,10 @@ public class SecurityConfig {
             auth -> auth
                 .requestMatchers(
                     ApiPaths.API_PREFIX + ApiPaths.AUTH + "/**",
-                    ApiPaths.API_PREFIX + ApiPaths.HEALTH
+                    ApiPaths.API_PREFIX + ApiPaths.HEALTH,
+                    ApiPaths.API_DOCS + "/**",
+                    ApiPaths.SWAGGER_UI + "/**",
+                    ApiPaths.SWAGGER_UI + ".html"
                 ).permitAll()
                 .anyRequest().authenticated()
         ).oauth2ResourceServer(oauth -> oauth.jwt(Customizer.withDefaults()));

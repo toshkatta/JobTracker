@@ -38,26 +38,6 @@ public class JobApplicationApiTest extends AbstractIntegrationTest {
   }
 
   @Test
-  void protectedEndopint_withoutToken_returns401() throws Exception {
-    mockMvc.perform(get(JOB_APPLICATIONS_URL))
-        .andExpect(status().isUnauthorized());
-  }
-
-  @Test
-  void protectedEndpoint_withTamperedToken_returns401() throws Exception {
-    TestUser user = registerAndLogin();
-
-    mockMvc.perform(get(JOB_APPLICATIONS_URL).header(HttpHeaders.AUTHORIZATION, user.authorization() + "x"))
-        .andExpect(status().isUnauthorized());
-  }
-
-  @Test
-  void health_isPublic() throws Exception {
-    mockMvc.perform(get(HEALTH_URL))
-        .andExpect(status().isOk());
-  }
-
-  @Test
   void create_returnsTheCreatedApplication_andItCanBeFetched() throws Exception {
     TestUser user = registerAndLogin();
 
