@@ -13,7 +13,7 @@ public class SecurityApiTest extends AbstractIntegrationTest {
   private static final String JOB_APPLICATIONS_URL = ApiPaths.API_PREFIX + ApiPaths.JOB_APPLICATIONS;
 
   @Test
-  void protectedEndopint_withoutToken_returns401() throws Exception {
+  void protectedEndpoint_withoutToken_returns401() throws Exception {
     mockMvc.perform(get(JOB_APPLICATIONS_URL))
         .andExpect(status().isUnauthorized());
   }

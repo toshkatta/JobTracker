@@ -1,6 +1,6 @@
 package com.todoratanasov.jobtracker.model;
 
-public class ApiExamples {
+public final class ApiExamples {
 
   public static final String EMAIL = "user@example.com";
   public static final String PASSWORD = "correct-horse-battery";

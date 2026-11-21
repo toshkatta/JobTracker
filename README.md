@@ -53,7 +53,6 @@ docker compose up -d
 
 Flyway creates the schema automatically on startup. The credentials in `docker-compose.yaml` and `application.properties` are for local development only.
 
-Interactive API docs at `/swagger-ui.html`
 Once it's running, interactive API documentation is at http://localhost:8081/swagger-ui.html (the raw OpenAPI document is at `/docs`). Log in via `POST /api/auth/login`, then press **Authorize** and paste the access token.
 
 ### Try it
