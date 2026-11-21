@@ -17,6 +17,10 @@ public record JobApplicationResponse(
     @Schema(description = "Where the application currently stands", example = "APPLIED") JobApplicationStatus status,
     @Schema(description = "Offered or expected salary, optional", example = "5000") Integer salary
 ) {
+  public static final Set<String> SORTABLE_FIELDS = Arrays.stream(JobApplicationResponse.class.getRecordComponents())
+      .map(RecordComponent::getName)
+      .collect(Collectors.toUnmodifiableSet());
+
   public static JobApplicationResponse from(JobApplication entity) {
     return new JobApplicationResponse(
         entity.getId(),
@@ -26,8 +30,4 @@ public record JobApplicationResponse(
         entity.getSalary()
     );
   }
-
-  public static final Set<String> SORTABLE_FIELDS = Arrays.stream(JobApplicationResponse.class.getRecordComponents())
-      .map(RecordComponent::getName)
-      .collect(Collectors.toUnmodifiableSet());
 }

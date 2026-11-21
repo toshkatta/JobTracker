@@ -4,7 +4,7 @@ import java.util.UUID;
 
 import org.springframework.security.oauth2.jwt.Jwt;
 
-public class AuthenticatedUser {
+public final class AuthenticatedUser {
 
   private AuthenticatedUser() {
   }

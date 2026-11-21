@@ -20,11 +20,6 @@ public class NoteService {
   private final NoteRepository noteRepository;
   private final JobApplicationRepository jobApplicationRepository;
 
-  private JobApplication getJobApplicationOrThrow(UUID ownerId, UUID jobApplicationId) {
-    return jobApplicationRepository.findByIdAndOwnerId(jobApplicationId, ownerId)
-        .orElseThrow(() -> new ApplicationNotFoundException(jobApplicationId));
-  }
-
   public NoteService(NoteRepository noteRepository, JobApplicationRepository jobApplicationRepository) {
     this.noteRepository = noteRepository;
     this.jobApplicationRepository = jobApplicationRepository;
@@ -51,5 +46,10 @@ public class NoteService {
     var note = noteRepository.findByIdAndJobApplicationId(noteId, jobApplicationId)
         .orElseThrow(() -> new NoteNotFoundException(noteId));
     noteRepository.delete(note);
+  }
+
+  private JobApplication getJobApplicationOrThrow(UUID ownerId, UUID jobApplicationId) {
+    return jobApplicationRepository.findByIdAndOwnerId(jobApplicationId, ownerId)
+        .orElseThrow(() -> new ApplicationNotFoundException(jobApplicationId));
   }
 }

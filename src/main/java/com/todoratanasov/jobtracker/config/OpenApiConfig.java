@@ -53,6 +53,13 @@ import io.swagger.v3.oas.models.responses.ApiResponse;
 )
 public class OpenApiConfig {
 
+  public static final String BEARER_AUTH = "bearerAuth";
+
+  public static final String TAG_HEALTH = "Health";
+  public static final String TAG_AUTH = "Authentication";
+  public static final String TAG_JOB_APPLICATIONS = "Job applications";
+  public static final String TAG_NOTES = "Notes";
+
   // Names of the shared responses, as references the controllers can use in @ApiResponse(ref = ...)
   public static final String BAD_REQUEST = "#/components/responses/BadRequest";
   public static final String UNAUTHORIZED = "#/components/responses/Unauthorized";
@@ -64,34 +71,7 @@ public class OpenApiConfig {
   private static final String PROBLEM_SCHEMA_REF = "#/components/schemas/Problem";
   private static final String FIELD_ERROR_SCHEMA_REF = "#/components/schemas/ProblemFieldError";
 
-  public static final String TAG_HEALTH = "Health";
-  public static final String TAG_AUTH = "Authentication";
-  public static final String TAG_JOB_APPLICATIONS = "Job applications";
-  public static final String TAG_NOTES = "Notes";
-
   private static final List<String> TAG_ORDER = List.of(TAG_HEALTH, TAG_AUTH, TAG_JOB_APPLICATIONS, TAG_NOTES);
-
-  private static int tagIndex(PathItem pathItem) {
-    return pathItem.readOperations().stream()
-        .flatMap(operation -> operation.getTags() == null ? Stream.<String>empty() : operation.getTags().stream())
-        .mapToInt(TAG_ORDER::indexOf)
-        .filter(index -> index >= 0)
-        .min()
-        .orElse(TAG_ORDER.size());
-  }
-
-  private static ApiResponse problem(String description) {
-    return new ApiResponse()
-        .description(description)
-        .content(
-            new Content().addMediaType(
-                org.springframework.http.MediaType.APPLICATION_PROBLEM_JSON_VALUE,
-                new MediaType().schema(new Schema<Object>().$ref(PROBLEM_SCHEMA_REF))
-            )
-        );
-  }
-
-  public static final String BEARER_AUTH = "bearerAuth";
 
   @Bean
   public OpenApiCustomizer sharedErrorResponses() {
@@ -166,5 +146,25 @@ public class OpenApiConfig {
           )
           .forEach(entry -> paths.addPathItem(entry.getKey(), entry.getValue()));
     };
+  }
+
+  private static int tagIndex(PathItem pathItem) {
+    return pathItem.readOperations().stream()
+        .flatMap(operation -> operation.getTags() == null ? Stream.<String>empty() : operation.getTags().stream())
+        .mapToInt(TAG_ORDER::indexOf)
+        .filter(index -> index >= 0)
+        .min()
+        .orElse(TAG_ORDER.size());
+  }
+
+  private static ApiResponse problem(String description) {
+    return new ApiResponse()
+        .description(description)
+        .content(
+            new Content().addMediaType(
+                org.springframework.http.MediaType.APPLICATION_PROBLEM_JSON_VALUE,
+                new MediaType().schema(new Schema<Object>().$ref(PROBLEM_SCHEMA_REF))
+            )
+        );
   }
 }

@@ -26,6 +26,7 @@ A REST API for tracking job applications: companies, positions, statuses, salari
 | Auth | Spring Security OAuth2 resource server (JWT, HS256) |
 | Tests | JUnit 5, Mockito, AssertJ, MockMvc, Testcontainers, JaCoCo |
 | Build | Maven (wrapper included) |
+| Code style | Spotless (formatting) and Checkstyle (structure), configured in `config/` |
 
 ## Getting started
 
@@ -83,6 +84,8 @@ curl "http://localhost:8081/api/job-applications?status=APPLIED&sort=salary,desc
 ```
 
 Docker must be running: the integration tests start a throwaway PostgreSQL container and never touch your development database. A coverage report is written to `target/site/jacoco/index.html`.
+
+To run everything CI runs (the tests plus the code-style checks), use `./mvnw verify`. To check or fix formatting on its own: `./mvnw spotless:check` and `./mvnw spotless:apply`.
 
 ## API overview
 

@@ -27,23 +27,6 @@ public class RefreshTokenService {
   private final Duration ttl;
   private final SecureRandom secureRandom = new SecureRandom();
 
-  private static String hashToken(String rawToken) {
-    try {
-      byte[] digest = MessageDigest.getInstance("SHA-256").digest(rawToken.getBytes(StandardCharsets.UTF_8));
-      return HexFormat.of().formatHex(digest);
-    } catch (NoSuchAlgorithmException e) {
-      throw new IllegalStateException("SHA-256 is guaranteed to exist on every JVM", e);
-    }
-  }
-
-  private String createAndStoreToken(User user, UUID familyId) {
-    byte[] bytes = new byte[TOKEN_BYTES];
-    secureRandom.nextBytes(bytes);
-    String rawToken = Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
-    repository.save(new RefreshToken(user, familyId, hashToken(rawToken), Instant.now().plus(ttl)));
-    return rawToken;
-  }
-
   public RefreshTokenService(RefreshTokenRepository repository, JwtProperties properties) {
     this.repository = repository;
     this.ttl = properties.refreshTtl();
@@ -79,5 +62,22 @@ public class RefreshTokenService {
   public void revokeTokenFamily(String rawToken) {
     repository.findByTokenHash(hashToken(rawToken))
         .ifPresent(token -> repository.revokeFamily(token.getFamilyId(), Instant.now()));
+  }
+
+  private static String hashToken(String rawToken) {
+    try {
+      byte[] digest = MessageDigest.getInstance("SHA-256").digest(rawToken.getBytes(StandardCharsets.UTF_8));
+      return HexFormat.of().formatHex(digest);
+    } catch (NoSuchAlgorithmException e) {
+      throw new IllegalStateException("SHA-256 is guaranteed to exist on every JVM", e);
+    }
+  }
+
+  private String createAndStoreToken(User user, UUID familyId) {
+    byte[] bytes = new byte[TOKEN_BYTES];
+    secureRandom.nextBytes(bytes);
+    String rawToken = Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
+    repository.save(new RefreshToken(user, familyId, hashToken(rawToken), Instant.now().plus(ttl)));
+    return rawToken;
   }
 }

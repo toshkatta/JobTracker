@@ -26,10 +26,6 @@ public class AuthService {
   private final RefreshTokenService refreshTokenService;
   private final String dummyHash;
 
-  private TokenResponse buildTokenResponse(User user, String refreshToken) {
-    return new TokenResponse(jwtService.issue(user), refreshToken, "Bearer", jwtService.getTtlSeconds());
-  }
-
   public AuthService(
       UserRepository userRepository,
       PasswordEncoder passwordEncoder,
@@ -78,5 +74,9 @@ public class AuthService {
   @Transactional
   public void logout(RefreshRequest request) {
     refreshTokenService.revokeTokenFamily(request.refreshToken());
+  }
+
+  private TokenResponse buildTokenResponse(User user, String refreshToken) {
+    return new TokenResponse(jwtService.issue(user), refreshToken, "Bearer", jwtService.getTtlSeconds());
   }
 }

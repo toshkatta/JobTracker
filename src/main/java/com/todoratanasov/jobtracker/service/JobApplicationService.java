@@ -23,11 +23,6 @@ public class JobApplicationService {
   private final JobApplicationRepository jobApplicationRepository;
   private final UserRepository userRepository;
 
-  private JobApplication getJobApplicationOrThrow(UUID ownerId, UUID id) {
-    return jobApplicationRepository.findByIdAndOwnerId(id, ownerId)
-        .orElseThrow(() -> new ApplicationNotFoundException(id));
-  }
-
   public JobApplicationService(JobApplicationRepository jobApplicationRepository, UserRepository userRepository) {
     this.jobApplicationRepository = jobApplicationRepository;
     this.userRepository = userRepository;
@@ -82,5 +77,10 @@ public class JobApplicationService {
   @Transactional
   public void delete(UUID ownerId, UUID id) {
     jobApplicationRepository.delete(getJobApplicationOrThrow(ownerId, id));
+  }
+
+  private JobApplication getJobApplicationOrThrow(UUID ownerId, UUID id) {
+    return jobApplicationRepository.findByIdAndOwnerId(id, ownerId)
+        .orElseThrow(() -> new ApplicationNotFoundException(id));
   }
 }
