@@ -13,8 +13,10 @@ A REST API for tracking job applications: companies, positions, statuses, salari
 - **Notes**: notes attached to each application, with an "important" flag
 - **Ownership**: every query is scoped to the logged-in user; another user's data looks like it doesn't exist
 - **Validation and errors**: Bean Validation with consistent [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457) `application/problem+json` error responses
+- **API documentation**: OpenAPI 3 with an interactive Swagger UI, generated from the code
 - **Database migrations** with Flyway, UUIDv7 primary keys
 - **Tests**: unit tests plus integration tests against a real PostgreSQL started by Testcontainers
+- **Delivery**: GitHub Actions CI, Dependabot updates, and a multi-stage Docker image that runs as a non-root user
 
 ## Tech stack
 
@@ -24,18 +26,17 @@ A REST API for tracking job applications: companies, positions, statuses, salari
 | Framework | Spring Boot 4.1 (Web MVC, Data JPA, Validation, Security) |
 | Database | PostgreSQL 18, Hibernate, Flyway |
 | Auth | Spring Security OAuth2 resource server (JWT, HS256) |
+| API docs | springdoc-openapi (OpenAPI 3, Swagger UI) |
 | Tests | JUnit 5, Mockito, AssertJ, MockMvc, Testcontainers, JaCoCo |
 | Build | Maven (wrapper included) |
 | Code style | Spotless (formatting) and Checkstyle (structure), configured in `config/` |
+| CI and containers | GitHub Actions, Dependabot, Docker and Docker Compose |
 
 ## Getting started
 
-### Prerequisites
+### Option 1: everything in Docker
 
-- JDK 25
-- Docker (for the local database and for running the tests)
-
-### Run it
+The only prerequisite is Docker.
 
 ```bash
 git clone https://github.com/toshkatta/JobTracker.git
@@ -45,14 +46,29 @@ cd JobTracker
 cp .env.example .env
 openssl rand -base64 32        # paste the output as JWT_SECRET in .env
 
-# 2. start PostgreSQL (port 5433)
+# 2. build and start the API and PostgreSQL
+docker compose --profile app up --build
+```
+
+The API is at http://localhost:8081. The first build takes a few minutes; later ones reuse cached layers. Stop everything with `docker compose --profile app down` (your data stays in the `pgdata` volume; add `-v` to delete it too).
+
+### Option 2: run from source
+
+Prerequisites: JDK 25 and Docker (for the database).
+
+```bash
+# same configuration step as above (.env with a real JWT_SECRET)
+
+# start PostgreSQL only (port 5433)
 docker compose up -d
 
-# 3. start the API on http://localhost:8081
+# start the API on http://localhost:8081
 ./mvnw spring-boot:run
 ```
 
 Flyway creates the schema automatically on startup. The credentials in `docker-compose.yaml` and `application.properties` are for local development only.
+
+### API documentation
 
 Once it's running, interactive API documentation is at http://localhost:8081/swagger-ui.html (the raw OpenAPI document is at `/docs`). Log in via `POST /api/auth/login`, then press **Authorize** and paste the access token.
 
@@ -137,9 +153,10 @@ src/main/java/com/todoratanasov/jobtracker
 └── security      helpers for the authenticated user
 src/main/resources/db/migration    Flyway migrations
 src/test                           unit and integration tests
-config/                            shared code-style configuration (formatter)
+config/                            shared code-style configuration (formatter, Checkstyle)
 .github/                           CI workflow and Dependabot configuration
-docker-compose.yaml                local PostgreSQL
+Dockerfile                         multi-stage build of the API image
+docker-compose.yaml                PostgreSQL, and the API under the "app" profile
 ```
 
 Layered architecture: controllers handle HTTP only, services hold the rules, repositories talk to the database. Entities never leave the service layer; the API returns DTO records.
@@ -155,6 +172,7 @@ Layered architecture: controllers handle HTTP only, services hold the rules, rep
 - **Flyway owns the schema.** Hibernate only validates it (`ddl-auto=validate`).
 - **Tests treat the API as a black box.** Integration tests send real requests through the full security filter chain to a real database. Test DTOs are deliberately separate from the production ones, so renaming a JSON field breaks a test.
 - **Error responses are documented once.** Shared `problem+json` schemas and responses live in the OpenAPI config and are referenced from every endpoint, so the docs stay consistent.
+- **A small, layered container image.** A multi-stage build keeps the compiler and Maven out of the final image, the Spring Boot jar is split into layers so code changes rebuild only the small top layer, and the app runs as a non-root user. No secrets are baked in; the JWT secret is passed at runtime.
 
 ## Known limitations
 
@@ -165,11 +183,14 @@ Layered architecture: controllers handle HTTP only, services hold the rules, rep
 - Security-filter errors (missing or invalid token) return an empty `401` body, not `problem+json`.
 - No roles or companies yet; every account is a regular user.
 - The OpenAPI document and Swagger UI are public, so anyone can explore the API. A production deployment would restrict or disable them (`springdoc.api-docs.enabled=false` and `springdoc.swagger-ui.enabled=false`).
+- The database credentials in `docker-compose.yaml` are local development values and must be replaced in any real deployment.
 
 ## Roadmap
 
 - [x] OpenAPI / Swagger UI documentation
-- [ ] Dockerfile and a single-command `docker compose` for the whole stack
-- [ ] GitHub Actions CI
+- [x] GitHub Actions CI
+- [x] Dockerfile and a single-command `docker compose` for the whole stack
+- [ ] Production profile and health checks (Spring Boot Actuator)
+- [ ] Public deployment
 - [ ] Frontend client
 - [ ] Companies and roles

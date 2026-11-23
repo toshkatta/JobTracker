@@ -17,5 +17,19 @@ services:
       timeout: 3s
       retries: 10
 
+  app:
+    build: .
+    profiles: [ "app" ]
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:8081:8081"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/jobtracker
+      SPRING_DATASOURCE_USERNAME: jobtracker
+      SPRING_DATASOURCE_PASSWORD: jobtracker
+      JWT_SECRET: ${JWT_SECRET:?set JWT_SECRET in .env}
+
 volumes:
   pgdata:
