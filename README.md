@@ -105,13 +105,12 @@ To run everything CI runs (the tests plus the code-style checks), use `./mvnw ve
 
 ## API overview
 
-All routes are under `/api`. Everything except `/health` and `/auth/*` needs an `Authorization: Bearer <access token>` header.
+All routes are under `/api`. Everything except `/actuator/health` and `/auth/*` needs an `Authorization: Bearer <access token>` header.
 
 The table below is a summary. Swagger UI documents every request, response and error in full.
 
 | Method | Path | Description |
 |---|---|---|
-| GET | `/health` | Liveness check |
 | POST | `/auth/register` | Create an account (`409` if the email is taken) |
 | POST | `/auth/login` | Returns an access token and a refresh token |
 | POST | `/auth/refresh` | Exchanges a refresh token for a new pair |

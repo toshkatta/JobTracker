@@ -36,7 +36,6 @@ import io.swagger.v3.oas.models.responses.ApiResponse;
             + "the Authorize button with the access token."
     ),
     tags = {
-        @Tag(name = OpenApiConfig.TAG_HEALTH, description = "Service status"),
         @Tag(name = OpenApiConfig.TAG_AUTH, description = "Public endpoints for accounts and tokens"),
         @Tag(
             name = OpenApiConfig.TAG_JOB_APPLICATIONS,
@@ -55,7 +54,6 @@ public class OpenApiConfig {
 
   public static final String BEARER_AUTH = "bearerAuth";
 
-  public static final String TAG_HEALTH = "Health";
   public static final String TAG_AUTH = "Authentication";
   public static final String TAG_JOB_APPLICATIONS = "Job applications";
   public static final String TAG_NOTES = "Notes";
@@ -71,7 +69,7 @@ public class OpenApiConfig {
   private static final String PROBLEM_SCHEMA_REF = "#/components/schemas/Problem";
   private static final String FIELD_ERROR_SCHEMA_REF = "#/components/schemas/ProblemFieldError";
 
-  private static final List<String> TAG_ORDER = List.of(TAG_HEALTH, TAG_AUTH, TAG_JOB_APPLICATIONS, TAG_NOTES);
+  private static final List<String> TAG_ORDER = List.of(TAG_AUTH, TAG_JOB_APPLICATIONS, TAG_NOTES);
 
   @Bean
   public OpenApiCustomizer sharedErrorResponses() {

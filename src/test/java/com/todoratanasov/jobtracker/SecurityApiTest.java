@@ -28,12 +28,6 @@ public class SecurityApiTest extends AbstractIntegrationTest {
   }
 
   @Test
-  void health_isPublic() throws Exception {
-    mockMvc.perform(get(HEALTH_URL))
-        .andExpect(status().isOk());
-  }
-
-  @Test
   void actuatorHealth_isPublic_andReportsUp() throws Exception {
     mockMvc.perform(get(ApiPaths.ACTUATOR_HEALTH))
         .andExpect(status().isOk())

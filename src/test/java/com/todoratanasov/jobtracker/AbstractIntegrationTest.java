@@ -25,7 +25,6 @@ import tools.jackson.databind.json.JsonMapper;
 @AutoConfigureMockMvc
 abstract class AbstractIntegrationTest {
 
-  protected static final String HEALTH_URL = ApiPaths.API_PREFIX + ApiPaths.HEALTH;
   protected static final String REGISTER_URL = ApiPaths.API_PREFIX + ApiPaths.AUTH + ApiPaths.REGISTER;
   protected static final String LOGIN_URL = ApiPaths.API_PREFIX + ApiPaths.AUTH + ApiPaths.LOGIN;
   protected static final String REFRESH_URL = ApiPaths.API_PREFIX + ApiPaths.AUTH + ApiPaths.REFRESH;

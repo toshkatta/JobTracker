@@ -26,9 +26,8 @@ public class OpenApiDocsTest extends AbstractIntegrationTest {
   @Test
   void openApiDocs_listTagsInTheIntendedOrder() throws Exception {
     mockMvc.perform(get(ApiPaths.API_DOCS))
-        .andExpect(jsonPath("$.tags[0].name").value("Health"))
-        .andExpect(jsonPath("$.tags[1].name").value("Authentication"))
-        .andExpect(jsonPath("$.tags[2].name").value("Job applications"))
-        .andExpect(jsonPath("$.tags[3].name").value("Notes"));
+        .andExpect(jsonPath("$.tags[0].name").value("Authentication"))
+        .andExpect(jsonPath("$.tags[1].name").value("Job applications"))
+        .andExpect(jsonPath("$.tags[2].name").value("Notes"));
   }
 }
