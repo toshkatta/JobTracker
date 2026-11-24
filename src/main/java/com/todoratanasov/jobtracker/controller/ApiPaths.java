@@ -13,6 +13,7 @@ public final class ApiPaths {
   public static final String LOGOUT = "/logout";
   public static final String API_DOCS = "/docs";
   public static final String SWAGGER_UI = "/swagger-ui";
+  public static final String ACTUATOR_HEALTH = "/actuator/health";
 
   private ApiPaths() {
   }

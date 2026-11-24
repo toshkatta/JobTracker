@@ -26,10 +26,18 @@ services:
     ports:
       - "127.0.0.1:8081:8081"
     environment:
+      SPRING_PROFILES_ACTIVE: prod
+      DOCS_ENABLED: "true"
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/jobtracker
       SPRING_DATASOURCE_USERNAME: jobtracker
       SPRING_DATASOURCE_PASSWORD: jobtracker
       JWT_SECRET: ${JWT_SECRET:?set JWT_SECRET in .env}
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -fs http://localhost:8081/actuator/health || exit 1" ]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 30s
 
 volumes:
   pgdata:

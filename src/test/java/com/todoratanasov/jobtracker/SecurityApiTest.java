@@ -1,6 +1,7 @@
 package com.todoratanasov.jobtracker;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.junit.jupiter.api.Test;
@@ -30,5 +31,12 @@ public class SecurityApiTest extends AbstractIntegrationTest {
   void health_isPublic() throws Exception {
     mockMvc.perform(get(HEALTH_URL))
         .andExpect(status().isOk());
+  }
+
+  @Test
+  void actuatorHealth_isPublic_andReportsUp() throws Exception {
+    mockMvc.perform(get(ApiPaths.ACTUATOR_HEALTH))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.status").value("UP"));
   }
 }

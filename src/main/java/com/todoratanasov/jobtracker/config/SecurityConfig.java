@@ -60,7 +60,8 @@ public class SecurityConfig {
                     ApiPaths.API_PREFIX + ApiPaths.HEALTH,
                     ApiPaths.API_DOCS + "/**",
                     ApiPaths.SWAGGER_UI + "/**",
-                    ApiPaths.SWAGGER_UI + ".html"
+                    ApiPaths.SWAGGER_UI + ".html",
+                    ApiPaths.ACTUATOR_HEALTH + "/**"
                 ).permitAll()
                 .anyRequest().authenticated()
         ).oauth2ResourceServer(oauth -> oauth.jwt(Customizer.withDefaults()));

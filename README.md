@@ -173,6 +173,7 @@ Layered architecture: controllers handle HTTP only, services hold the rules, rep
 - **Tests treat the API as a black box.** Integration tests send real requests through the full security filter chain to a real database. Test DTOs are deliberately separate from the production ones, so renaming a JSON field breaks a test.
 - **Error responses are documented once.** Shared `problem+json` schemas and responses live in the OpenAPI config and are referenced from every endpoint, so the docs stay consistent.
 - **A small, layered container image.** A multi-stage build keeps the compiler and Maven out of the final image, the Spring Boot jar is split into layers so code changes rebuild only the small top layer, and the app runs as a non-root user. No secrets are baked in; the JWT secret is passed at runtime.
+- **Profiles.** `prod` is a profile, not a separate build: the same image runs everywhere and behavior is switched with environment variables.
 
 ## Known limitations
 
@@ -182,7 +183,7 @@ Layered architecture: controllers handle HTTP only, services hold the rules, rep
 - Access tokens cannot be revoked before they expire (at most 15 minutes).
 - Security-filter errors (missing or invalid token) return an empty `401` body, not `problem+json`.
 - No roles or companies yet; every account is a regular user.
-- The OpenAPI document and Swagger UI are public, so anyone can explore the API. A production deployment would restrict or disable them (`springdoc.api-docs.enabled=false` and `springdoc.swagger-ui.enabled=false`).
+- The OpenAPI document and Swagger UI are enabled in the `prod` profile only when `DOCS_ENABLED=true`, which the public demo sets deliberately.
 - The database credentials in `docker-compose.yaml` are local development values and must be replaced in any real deployment.
 
 ## Roadmap
@@ -190,7 +191,7 @@ Layered architecture: controllers handle HTTP only, services hold the rules, rep
 - [x] OpenAPI / Swagger UI documentation
 - [x] GitHub Actions CI
 - [x] Dockerfile and a single-command `docker compose` for the whole stack
-- [ ] Production profile and health checks (Spring Boot Actuator)
+- [x] Production profile and health checks (Spring Boot Actuator)
 - [ ] Public deployment
 - [ ] Frontend client
 - [ ] Companies and roles

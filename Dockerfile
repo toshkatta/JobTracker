@@ -10,9 +10,9 @@ COPY src src
 
 # The cache mount keeps downloaded Maven dependencies between builds
 RUN --mount=type=cache,target=/root/.m2 \
-    ./mvnw -B --no-transfer-progress -DskipTests package \
-    && mv target/*.jar application.jar \
-    && java -Djarmode=tools -jar application.jar extract --layers --destination extracted
+  ./mvnw -B --no-transfer-progress -DskipTests package \
+  && mv target/*.jar application.jar \
+  && java -Djarmode=tools -jar application.jar extract --layers --destination extracted
 
 # ---- Stage 2: runtime ----
 FROM eclipse-temurin:25-jre-noble
@@ -25,6 +25,9 @@ COPY --from=build /build/extracted/dependencies/ ./
 COPY --from=build /build/extracted/spring-boot-loader/ ./
 COPY --from=build /build/extracted/snapshot-dependencies/ ./
 COPY --from=build /build/extracted/application/ ./
+
+RUN apt-get update && apt-get install -y --no-install-recommends curl \
+  && rm -rf /var/lib/apt/lists/*
 
 USER appuser
 EXPOSE 8081
