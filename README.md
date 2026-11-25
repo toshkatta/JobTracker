@@ -105,7 +105,7 @@ To run everything CI runs (the tests plus the code-style checks), use `./mvnw ve
 
 ## API overview
 
-All routes are under `/api`. Everything except `/actuator/health` and `/auth/*` needs an `Authorization: Bearer <access token>` header.
+All API routes are under `/api`. Everything except `/auth/*` needs an `Authorization: Bearer <access token>` header. Health checks are public at `/actuator/health`.
 
 The table below is a summary. Swagger UI documents every request, response and error in full.
 
@@ -191,6 +191,5 @@ Layered architecture: controllers handle HTTP only, services hold the rules, rep
 - [x] GitHub Actions CI
 - [x] Dockerfile and a single-command `docker compose` for the whole stack
 - [x] Production profile and health checks (Spring Boot Actuator)
-- [ ] Public deployment
 - [ ] Frontend client
 - [ ] Companies and roles
